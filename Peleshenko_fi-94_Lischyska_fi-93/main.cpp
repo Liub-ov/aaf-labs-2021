@@ -19,6 +19,13 @@ string ParseIdentificators(string inputString, string ID)
     {
         cout << "create" << endl;
         if (regex_search(inputString, return_value, CREATE_FULL)) {
+            char temp[1024]{};
+            char* pch;
+            strcpy(temp, inputString.c_str());
+            for (int i = 0; pch != nullptr; i++) {
+                pch = strtok(NULL, " ,.");
+                if (i == 0) cout << "table " << pch << " has been created\n";
+            }
             for (int i = 0; i < 3; i++) {
                 return return_value[i].str();
             }
@@ -30,6 +37,16 @@ string ParseIdentificators(string inputString, string ID)
         cout << "insert" << endl;
 
         if (regex_search(inputString, return_value, INSERT_FULL)) {
+            /*char temp[1024]{};
+            char *pch;
+            char *table;
+            strcpy(temp, inputString.c_str());
+            for (int i=0; pch != nullptr; i++){
+                pch = strtok(NULL, " ,.()");
+                if (i==1) table = pch;
+                if (i!=2) cout<<pch<<" ";
+            }
+            cout<<"has been inserted into table "<<table<<"\n";*/
             for (int i = 0; i < 3; i++) {
                 return return_value[i].str();
             }
