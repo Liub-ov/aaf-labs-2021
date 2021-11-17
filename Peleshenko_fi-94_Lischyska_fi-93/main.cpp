@@ -12,11 +12,11 @@ string ParseIdentificators(string inputString, string ID)
     const regex INSERT_FULL(R"(([iI][nN][sS][eE][rR][tT]) *((\n)+|( +))(\n)*( *)([a-zA-Z0-9_]+) *(\n)* *\(+(\n)* *(\n)*(\"+([^\"]+) *(\n)*( *)\"+ *(\n)*( *),+ *(\n)*( *)){0,}\"+([^\"]+) *(\n)*( *"+ *(\n)*( *)\)+) *\n* *;)");
     const regex INSERT_INTO(R"(([iI][nN][sS][eE][rR][tT]) *((\n)+|( +))([iI][nN][tT][oO]) *(\n)*( *)([a-zA-Z0-9_]+) *(\n)* *\(+(\n)* *(\n)*(\"+([^\"]+) *(\n)*( *)\"+ *(\n)*( *),+ *(\n)*( *)){0,}\"+([^\"]+) *(\n)*( *"+ *(\n)*( *)\)+) *\n* *;)");
     const regex SELECT(R"(([sS][eE][lL][eE][cC][tT]))");
-    const regex SELECT_ALL(R"/(([sS][eE][lL][eE][cC][tT]) *(((\n)* *)|( *))(\*) *(\n)*(([fF][rR][oO][mM])) *(((\n)+ *)|( +))(\n)*([a-zA-Z0-9]+) *(((\n)+ *)|( *));)/");
-    const regex SELECT_WHERE(R"(([sS][eE][lL][eE][cC][tT]) *(((\n)+ *)|( +))(\n)*(([a-zA-Z0-9]+ *(((\n)+ *)|( *)), *(((\n)+ *)|( *))){0,}([a-zA-Z0-9]+)) *(((\n)+ *)|( *))(([fF][rR][oO][mM])) *(((\n)+ *)|( +))([a-zA-Z0-9]+) *(((\n)+ *)|( *))([wW][hH][eE][rR][eE])(((\n)+ *)|( +))([a-zA-Z0-9]+)(((\n)+ *)|( *))((=+)(((\n)+ *)|( *)))(\n)*((\"+[^\"]+\"*)(((\n)+ *)|( *)) *(((\n)+ *)|( *))\"+) *(((\n)+ *)|( *));+)");
-    const regex SELECT_ON(R"(([sS][eE][lL][eE][cC][tT]) *(((\n)+ *)|( +))(([a-zA-Z0-9]+ *(((\n)+ *)|( *)), *(((\n)+ *)|( *))){0,}([a-zA-Z0-9]+)) *(((\n)+ *)|( *))(([fF][rR][oO][mM])) *(((\n)+ *)|( +))([a-zA-Z0-9]+) *(((\n)+ *)|( +))+ *([lL][eE][fF][tT]_[jJ][oO][iI][nN]) *(((\n)+ *)|( +))([a-zA-Z0-9]+ *(((\n)+ *)|( +))(\n)*([oO][nN])(((\n)+ *)|( +))(\n)*([a-zA-Z0-9])+ *(((\n)+ *)|( +))(=+)(((\n)+ *)|( +))+ *(\n)*([a-zA-Z0-9])+ *((\n)* *))+ *(\n)*;+)");
+    const regex SELECT_ALL(R"(([sS][eE][lL][eE][cC][tT]) *(((\n)+ *)|( +))((\*)|(\*|([a-zA-Z0-9]+|(\*)) *(((\n)+ *)|( *)), *(((\n)+ *)|( *))){0,}([a-zA-Z0-9]+)) *(\n)*(([fF][rR][oO][mM])) *(((\n)+ *)|( +))(\n)*([a-zA-Z0-9]+) *(((\n)+ *)|( *));)");
+    const regex SELECT_WHERE(R"(([sS][eE][lL][eE][cC][tT]) *(((\n)+ *)|( +))(\n)*(((\*|[a-zA-Z0-9]+|(\*)) *(((\n)+ *)|( *)), *(((\n)+ *)|( *))){0,}(\*|[a-zA-Z0-9]+)) *(((\n)+ *)|( *))(([fF][rR][oO][mM])) *(((\n)+ *)|( +))([a-zA-Z0-9]+) *(((\n)+ *)|( *))([wW][hH][eE][rR][eE])(((\n)+ *)|( +))([a-zA-Z0-9]+)(((\n)+ *)|( *))((=+)(((\n)+ *)|( *)))(\n)*((\"+[^\"]+\"*)(((\n)+ *)|( *)) *(((\n)+ *)|( *))\"+) *(((\n)+ *)|( *));+)");
+    const regex SELECT_ON(R"(([sS][eE][lL][eE][cC][tT]) *(((\n)+ *)|( +))(((\*|[a-zA-Z0-9]+|(\*)) *(((\n)+ *)|( *)), *(((\n)+ *)|( *))){0,}(\*|[a-zA-Z0-9]+)) *(((\n)+ *)|( *))(([fF][rR][oO][mM])) *(((\n)+ *)|( +))([a-zA-Z0-9]+) *(((\n)+ *)|( +))+ *([lL][eE][fF][tT]_[jJ][oO][iI][nN]) *(((\n)+ *)|( +))([a-zA-Z0-9]+ *(((\n)+ *)|( +))(\n)*([oO][nN])(((\n)+ *)|( +))(\n)*([a-zA-Z0-9])+ *(((\n)+ *)|( +))(=+)(((\n)+ *)|( +))+ *(\n)*([a-zA-Z0-9])+ *((\n)* *))+ *(\n)*;+)");
     const regex DELETE(R"(([dD][eE][lL][eE][tT][eE]))");
-    const regex DELETE_ALL(R"(([dD][eE][lL][eE][tT][eE]) *(((\n)+ *)|( +))(\n)*(( *[a-zA-Z0-9]+ *(((\n)+ *)|( *)))) *(\n)*;+)");
+    const regex DELETE_ALL(R"(([dD][eE][lL][eE][tT][eE]) *(((\n)+ *)|( +))(\n)*([fF][rR][oO][mM])(( *[a-zA-Z0-9]+ *(((\n)+ *)|( *)))) *(\n)*;+)");
     const regex DELETE_NAME(R"(([dD][eE][lL][eE][tT][eE]) *(((\n)+ *)|( +))([a-zA-Z0-9]+)(((\n)+ *)|( *))(\n)*([wW][hH][eE][rR][eE]) *(((\n)+ *)|( +))[a-zA-Z0-9]+ *(((\n)+ *)|( *))(=+) *(((\n)+ *)|( *))\"+[^\"]+\"*(((\n)+ *)|( *));+)");
     const regex DELETE_ID(R"(([dD][eE][lL][eE][tT][eE]) *(((\n)+ *)|( +))([a-zA-Z0-9]+ *(((\n)+ *)|( *)))([wW][hH][eE][rR][eE]) *(((\n)+ *)|( +))[a-zA-Z0-9]+ *(((\n)+ *)|( *))(=|!=|>|<|>=|<=) *(((\n)+ *)|( *))\" *(((\n)+ *)|( *))[0-9]+ *(((\n)+ *)|( *))\" *(((\n)+ *)|( *));+)");
     const regex WHERE(R"(([wW][hH][eE][rR][eE]))");
@@ -36,7 +36,8 @@ string ParseIdentificators(string inputString, string ID)
         if (regex_search(inputString, return_value, CREATE_FULL)) {
             strcpy(temp, inputString.c_str());
             for (int i = 0; line != nullptr; i++) {
-                line = strtok(nullptr, " ,.(");
+                line = strtok(temp, " ,.(");
+                line = strtok(NULL, " ,.(");
                 if (i == 0) cout << "table " << line << " has been created\n";
             }
             for (int i = 0; i < 3; i++) {
@@ -53,8 +54,9 @@ string ParseIdentificators(string inputString, string ID)
         if (regex_search(inputString, return_value, INSERT_FULL)) {
 
             strcpy(temp, inputString.c_str());
+            line = strtok(temp, " ,.();");
             for (int i = 0; line != nullptr; i++) {
-                line = strtok(nullptr, "();");
+                line = strtok(NULL, " ,.();");
                 if (i == 0) table = line;
                 if (i > 0 && line != nullptr) cout << line << " ";
             }
@@ -68,8 +70,9 @@ string ParseIdentificators(string inputString, string ID)
         if (regex_search(inputString, return_value, INSERT_INTO)) {
 
             strcpy(temp, inputString.c_str());
+            line = strtok(temp, " ,.();");
             for (int i = 0; line != nullptr; i++) {
-                line = strtok(nullptr, " ,.();");
+                line = strtok(NULL, " ,.();");
                 if (i == 1) table = line;
                 if (i > 1 && line != nullptr) cout << line << " ";
             }
@@ -89,11 +92,19 @@ string ParseIdentificators(string inputString, string ID)
         if (regex_search(inputString, return_value, SELECT_ALL)) {
 
             strcpy(temp, inputString.c_str());
+            line = strtok(temp, " ,.();");
             for (int i = 0; line != nullptr; i++) {
-                line = strtok(nullptr, " ,.();");
-                if (i == 2) table = line;
+                line = strtok(NULL, " ,.();=");
+                if (line == NULL) break;
+                temps = line;
+                if (regex_search(temps, test, FROM)) {
+                    t = i;
+                    flag = 1;
+                }
+                if (flag == 0) cout << line << " ";
+                if (t + 1 == i && line != nullptr) table = line;
             }
-            cout << "all elements has been selected from table " << table << "\n";
+            cout << "elements has been selected from table " << table << "\n";
 
             for (int i = 0; i < 3; i++) {
                 return return_value[i].str();
@@ -104,6 +115,7 @@ string ParseIdentificators(string inputString, string ID)
         if (regex_search(inputString, return_value, SELECT_WHERE)) {
 
             strcpy(temp, inputString.c_str());
+            line = strtok(temp, " ,.();=");
             for (int i = 0; line != NULL; i++) {
                 line = strtok(NULL, " ,.();=");
                 if (line == NULL) break;
@@ -137,6 +149,7 @@ string ParseIdentificators(string inputString, string ID)
         if (regex_search(inputString, return_value, SELECT_ON)) {
 
             strcpy(temp, inputString.c_str());
+            line = strtok(temp, " ,.();=");
             for (int i = 0; line != NULL; i++) {
                 line = strtok(NULL, " ,.();=");
                 if (line == NULL) break;
@@ -181,10 +194,10 @@ string ParseIdentificators(string inputString, string ID)
         if (regex_search(inputString, return_value, DELETE_ALL)) {
 
             strcpy(temp, inputString.c_str());
-
+            line = strtok(temp, " ,.(;");
             for (int i = 0; line != nullptr; i++) {
-                line = strtok(nullptr, " ,.(;");
-                if (i == 0 && line != nullptr) cout << "table " << line << " has been deleted\n";
+                line = strtok(NULL, " ,.(;");
+                if (i == 1 && line != nullptr) cout << "table " << line << " has been deleted\n";
             }
             for (int i = 0; i < 3; i++) {
                 return return_value[i].str();
@@ -193,6 +206,7 @@ string ParseIdentificators(string inputString, string ID)
         if (regex_search(inputString, return_value, DELETE_NAME)) {
 
             strcpy(temp, inputString.c_str());
+            line = strtok(temp, " ,.();=");
             for (int i = 0; line != NULL; i++) {
                 line = strtok(NULL, " ,.();=");
                 if (line == NULL) break;
@@ -215,6 +229,7 @@ string ParseIdentificators(string inputString, string ID)
             }
         }
     }
+    throw std::invalid_argument("_");
 
     delete table;
     delete table1;
@@ -224,7 +239,7 @@ string ParseIdentificators(string inputString, string ID)
     delete line;
     line = nullptr;
 
-    throw std::invalid_argument("_");
+
 
 }
 
