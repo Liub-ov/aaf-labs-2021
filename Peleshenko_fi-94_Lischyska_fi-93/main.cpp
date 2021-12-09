@@ -1,10 +1,131 @@
 #include <iostream>
 #include <string>
 #include <regex>
+#include <iomanip>
+#include <sstream>
+
+
+
+bool operator==(const std::string str, int number) {
+
+    std::stringstream ss(str);
+    int strAsInt;
+    ss >> strAsInt;
+    return (strAsInt = number);
+
+}
+
+
+
+bool operator!=(const std::string str, int number) {
+
+    std::stringstream ss(str);
+    int strAsInt;
+    ss >> strAsInt;
+    return (strAsInt != number);
+
+}
+
 
 using namespace std;
 
-string ParseIdentificators(string inputString, string ID)
+void show_all_table(string*** tables)
+{
+    for (int table_id = 0; table_id < 5; table_id++) {
+        if (!tables[table_id][0][0].empty()) {
+            cout << "table name = " << tables[table_id][0][0] << endl;
+            for (int i = 1; i < 5 && !tables[table_id][i][0].empty(); i++)
+            {
+                for (int j = 0; j < 21; j++) {
+                    if (j == 20) {
+                        cout << "+";
+                        continue;
+                    }
+                    else
+                        cout << "-";
+                }
+
+            }
+            cout << endl;
+            for (int j = 1; j < 6 && !tables[table_id][j][0].empty(); j++) cout << setw(20) << tables[table_id][j][0] << "|";
+            cout << endl;
+            for (int i = 1; i < 5 && !tables[table_id][i][0].empty(); i++)
+            {
+                for (int j = 0; j < 21; j++) {
+                    if (j == 20) {
+                        cout << "+";
+                        continue;
+                    }
+                    else
+                        cout << "-";
+                }
+            }
+            cout << endl;
+            for (int j = 1; j < 6; j++)
+            {
+
+                for (int k = 1; k < 6; k++) {
+                    if (!tables[table_id][k][j].empty()) {
+                        cout << setw(20) << tables[table_id][k][j] << "|";
+
+                    }
+
+                }
+                cout << endl;
+                //if(!tables[table_id][0][j].empty()){cout<<endl;}
+
+
+            }
+
+            for (int i = 1; i < 5 && !tables[table_id][i][0].empty(); i++)
+            {
+                for (int j = 0; j < 21; j++) {
+                    if (j == 20) {
+                        cout << "+";
+                        continue;
+                    }
+                    else
+                        cout << "-";
+                }
+
+            }
+            cout << endl;
+
+        }
+    }
+}
+
+void show_table(string*** tables, int table_id)
+{
+    cout << "table name = " << tables[table_id][0][0] << endl;
+
+    for (int j = 1; j < 6 && !tables[table_id][j][0].empty(); j++) cout << setw(20) << tables[table_id][j][0] << "|";
+    cout << endl;
+    for (int i = 1; i < 5 && !tables[table_id][i][0].empty(); i++)
+    {
+        for (int j = 0; j < 21; j++)
+            cout << "-";
+    }
+    cout << endl;
+    for (int j = 1; j < 6; j++)
+    {
+
+        for (int k = 1; k < 6; k++) {
+            if (!tables[table_id][k][j].empty()) {
+                cout << setw(20) << tables[table_id][k][j] << "|";
+            }
+
+        }
+    }
+}
+
+
+
+
+
+
+
+string ParseIdentificators(string inputString, string ID, string*** tables)
 {
     const regex CREATE(R"(([cC][rR][eE][aA][tT][eE]))");
     const regex CREATE_FULL(R"(([cC][rR][eE][aA][tT][eE])((\n)+|( +))(\n)*([a-zA-Z0-9_]+)(\n)* *(\n)*\(+(\n)* *(\n)*(([a-zA-Z0-9_])+ *((\n)* *)([iI][nN][dD][eE][xX][eE][dD])* *((\n)* *),+ *(\n)* *){0,}([a-zA-Z0-9_]+)(( *\n+ *| +)([iI][nN][dD][eE][xX][eE][dD]))*(\n)* *(\n)*\)+(\n)* *(\n)*;+)");
@@ -28,6 +149,22 @@ string ParseIdentificators(string inputString, string ID)
     char* table, * all, * el, * res, * table1, * table2;
     string temps;
     smatch tested, return_value, test;
+    int t = 1000, flag = 0, k = 1000, h = 1000;
+    // string ***tables = new string**[5];
+
+
+
+
+
+    string* values;
+
+    cout << "avaluable tables= ";
+
+    for (int i = 0; i < 5; i++) cout << tables[i][0][0];
+    //       tables[i]="dsad";
+    cout << endl;
+
+
 
 
 
@@ -35,11 +172,55 @@ string ParseIdentificators(string inputString, string ID)
     {
         if (regex_search(inputString, return_value, CREATE_FULL)) {
             strcpy(temp, inputString.c_str());
-            for (int i = 0; line != nullptr; i++) {
-                line = strtok(temp, " ,.(");
-                line = strtok(NULL, " ,.(");
-                if (i == 0) cout << "table " << line << " has been created\n";
+
+            line = strtok(temp, " ,.(");
+            line = strtok(NULL, " ,.(");
+            //-------------------------------------------------------------------------- створення таблиці
+
+            for (int i = 0; i < 5; i++) {
+                if (line == tables[i][0][0]) {
+                    cout << "A table with that name have been created (" << i << ")\n";
+                    throw std::invalid_argument("_");
+                    break;
+                }
             }
+            for (int i = 0; i <= 5; i++)
+            {
+
+                if (i == 5) {
+                    cout << "tables more than 5!\n";
+                    throw std::invalid_argument("_");
+                    break;
+                }
+
+                if (tables[i][0][0].empty())
+                {
+
+                    tables[i][0][0] = line;
+                    cout << "table " << tables[i][0][0] << " has been created\n";
+
+                    line = strtok(NULL, " ,.();");
+                    int column_size = 0;
+                    for (int j = 1; line != nullptr && j < 6; j++)
+                    {
+                        tables[i][j][0] = line;
+
+                        line = strtok(NULL, " ,.();");
+
+                        column_size++;
+                    }
+
+                    for (int j = 0; j < 6; j++)
+                        cout << tables[i][j][0] << "\t";
+
+                    tables[i][0][1] = column_size + 48;
+                    break;
+                }
+            }
+
+            cout << endl;
+            //--------------------------------------------------------------------------
+
             for (int i = 0; i < 3; i++) {
                 return return_value[i].str();
             }
@@ -53,38 +234,186 @@ string ParseIdentificators(string inputString, string ID)
 
         if (regex_search(inputString, return_value, INSERT_FULL)) {
 
+            bool flag_correct_table_name = 0;
             strcpy(temp, inputString.c_str());
-            line = strtok(temp, " ,.();");
-            for (int i = 0; line != nullptr; i++) {
-                line = strtok(NULL, " ,.();");
-                if (i == 0) table = line;
-                if (i > 0 && line != nullptr) cout << line << " ";
+
+            line = strtok(temp, " ,\".();");
+            line = strtok(NULL, " ,\".();");
+            table = line;
+            cout << "table=" << line << endl;
+            for (int i = 0; i < 6 && line != nullptr; i++)
+            {
+                if (i == 5)
+                {
+                    cout << "cant find table with that name" << line << "\n";
+                    throw std::invalid_argument("_");
+                    break;
+
+                }
+                if (line == tables[i][0][0])
+                {
+
+
+                    //--------------------------------------------------------------------------
+                    //обрахунок кількості елементів та перевірка аргументів
+                    int count_arguments = 0;
+                    for (int i = 0; temp[i] != ';'; i++)
+                    {
+                        if (temp[i] == '"') count_arguments++;
+                    }
+                    count_arguments /= 2;
+                    cout << "\ncount_arguments=" << count_arguments << endl;;
+
+                    if (tables[i][0][1] != count_arguments)
+                    {
+                        cout << "arguments " << count_arguments << "but should be(" << tables[i][0][1] << ")" << endl;
+                        throw std::invalid_argument("_");
+                        break;
+
+                    }
+                    //обрахунок кількості елементів та перевірка аргументів
+                    //--------------------------------------------------------------------------
+
+
+
+                    for (int m = 1; m < 7; m++)
+                    {
+
+
+                        //cout<<tables[i][m][0];
+                        if (tables[i][1][m].empty())
+                        {
+
+
+
+                            cout << "m=" << m << endl;
+                            for (int j = 1; line != nullptr;)
+                            {
+
+                                line = strtok(NULL, ",\".();");
+
+                                if (line != nullptr && line[0] != ' ') {
+
+                                    tables[i][j][m] = line;
+                                    j++;
+
+                                }
+                                else continue;
+                            }
+
+                            break;
+                        }
+                    }
+                }
             }
-            cout << "has been inserted into table " << table << "\n";
+
+
+            cout << "has been inserted table " << table << "\n";
             for (int i = 0; i < 3; i++) {
                 return return_value[i].str();
             }
             line = nullptr;
         }
+
+
+
+
+
+
+
 
         if (regex_search(inputString, return_value, INSERT_INTO)) {
 
+            bool flag_correct_table_name = 0;
             strcpy(temp, inputString.c_str());
-            line = strtok(temp, " ,.();");
-            for (int i = 0; line != nullptr; i++) {
-                line = strtok(NULL, " ,.();");
-                if (i == 1) table = line;
-                if (i > 1 && line != nullptr) cout << line << " ";
+
+            line = strtok(temp, " ,\".();");
+            line = strtok(NULL, " ,\".();");
+            line = strtok(NULL, " ,\".();");
+            table = line;
+            cout << "table=" << line << endl;
+            for (int i = 0; i < 6 && line != nullptr; i++)
+            {
+                if (i == 5)
+                {
+                    cout << "cant find table with that name" << line << "\n";
+                    throw std::invalid_argument("_");
+                    break;
+
+                }
+                if (line == tables[i][0][0])
+                {
+
+
+                    //--------------------------------------------------------------------------
+                    //обрахунок кількості елементів та перевірка аргументів
+                    int count_arguments = 0;
+                    for (int i = 0; temp[i] != ';'; i++)
+                    {
+                        if (temp[i] == '"') count_arguments++;
+                    }
+                    count_arguments /= 2;
+                    cout << "\ncount_arguments=" << count_arguments << endl;;
+
+                    if (tables[i][0][1] != count_arguments)
+                    {
+                        cout << "arguments " << count_arguments << "but should be(" << tables[i][0][1] << ")" << endl;
+                        throw std::invalid_argument("_");
+                        break;
+
+                    }
+                    //обрахунок кількості елементів та перевірка аргументів
+                    //--------------------------------------------------------------------------
+
+
+
+                    for (int m = 1; m < 7; m++)
+                    {
+
+
+                        //cout<<tables[i][m][0];
+                        if (tables[i][1][m].empty())
+                        {
+
+
+
+                            cout << "m=" << m << endl;
+                            for (int j = 1; line != nullptr;)
+                            {
+                                //                                if(){
+                                //                                    line = strtok(NULL, ",\".();");
+                                //                                    continue;
+                                //                                }
+                                line = strtok(NULL, ",\".();");
+
+                                if (line != nullptr && line[0] != ' ') {
+
+                                    tables[i][j][m] = line;
+                                    j++;
+
+                                }
+                                else continue;
+                            }
+
+                            break;
+
+
+                        }
+
+
+                    }
+                }
             }
-            cout << "has been inserted into table " << table << "\n";
+
+            cout << "has been inserted INTO table " << table << "\n";
             for (int i = 0; i < 3; i++) {
                 return return_value[i].str();
             }
             line = nullptr;
-        }
-    }
 
-    int t = 1000, flag = 0, k = 1000, h = 1000;
+        }
+
+    }
 
     if (regex_search(ID, tested, SELECT))
     {
@@ -194,11 +523,28 @@ string ParseIdentificators(string inputString, string ID)
         if (regex_search(inputString, return_value, DELETE_ALL)) {
 
             strcpy(temp, inputString.c_str());
+
             line = strtok(temp, " ,.(;");
-            for (int i = 0; line != nullptr; i++) {
-                line = strtok(NULL, " ,.(;");
-                if (i == 1 && line != nullptr) cout << "table " << line << " has been deleted\n";
+            line = strtok(NULL, " ,.(;");
+            line = strtok(NULL, " ,.(;");
+            for (int i = 0; i < 5; i++)
+            {
+                if (tables[i][0][0] == line)
+                {
+
+                    for (int j = 0; j < 6; j++)
+                    {
+                        for (int m = 0; m < 6; m++)
+                        {
+                            tables[i][j][m].clear();
+                        }
+                    }
+
+                }
             }
+
+            cout << "table " << line << " has been deleted\n";
+
             for (int i = 0; i < 3; i++) {
                 return return_value[i].str();
             }
@@ -246,8 +592,28 @@ string ParseIdentificators(string inputString, string ID)
 
 int main()
 {
+
+
+    //    for(int i=0; i<255; i++)
+    //    {
+    //        cout<<"i= "<<i<<"=\t"<<(char)i<<endl;
+    //    }
+
     string s;
+    string*** tables = new string * *[5];
+    for (int i = 0; i < 5; i++)
+    {
+        tables[i] = new string * [6];
+    }
+    for (int i = 0; i < 5; i++)
+    {
+        for (int j = 0; j < 6; j++)
+        {
+            tables[i][j] = new string[6];
+        }
+    }
     while (s != "exit") {
+
         s.clear();
         cout << "Enter command: " << flush;
         getline(cin, s, ';');
@@ -258,7 +624,7 @@ int main()
         line = strtok(temp, " ,.");
         try
         {
-            s = ParseIdentificators(s, line);
+            s = ParseIdentificators(s, line, tables);
         }
         catch (const exception&)
         {
@@ -266,5 +632,6 @@ int main()
             continue;
         }
         cout << "Succesfully completed" << endl;
+        show_all_table(tables);
     }
 }
