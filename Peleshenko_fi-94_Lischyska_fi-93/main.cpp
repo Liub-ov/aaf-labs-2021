@@ -6,6 +6,13 @@
 
 
 
+bool is_number(const std::string& s)
+{
+    return !s.empty() && std::find_if(s.begin(),
+        s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
+}
+
+
 bool operator==(const std::string str, int number) {
 
     std::stringstream ss(str);
@@ -68,6 +75,15 @@ void show_all_table(string*** tables)
                     if (!tables[table_id][k][j].empty()) {
                         cout << setw(20) << tables[table_id][k][j] << "|";
 
+                    }
+                    else {
+                        bool flag = 0;
+                        for (int kk = k; kk < 6; kk++)
+                        {
+                            if (!tables[table_id][kk][j].empty()) flag = 1;
+                        }
+                        if (flag) { cout << setw(20) << tables[table_id][k][j] << "|"; }
+                        else continue;
                     }
 
                 }
@@ -138,13 +154,14 @@ string ParseIdentificators(string inputString, string ID, string*** tables)
     const regex SELECT_ON(R"(([sS][eE][lL][eE][cC][tT]) *(((\n)+ *)|( +))(((\*|[a-zA-Z0-9]+|(\*)) *(((\n)+ *)|( *)), *(((\n)+ *)|( *))){0,}(\*|[a-zA-Z0-9]+)) *(((\n)+ *)|( *))(([fF][rR][oO][mM])) *(((\n)+ *)|( +))([a-zA-Z0-9]+) *(((\n)+ *)|( +))+ *([lL][eE][fF][tT]_[jJ][oO][iI][nN]) *(((\n)+ *)|( +))([a-zA-Z0-9]+ *(((\n)+ *)|( +))(\n)*([oO][nN])(((\n)+ *)|( +))(\n)*([a-zA-Z0-9])+ *(((\n)+ *)|( +))(=+)(((\n)+ *)|( +))+ *(\n)*([a-zA-Z0-9])+ *((\n)* *))+ *(\n)*;+)");
     const regex DELETE(R"(([dD][eE][lL][eE][tT][eE]))");
     const regex DELETE_ALL(R"(([dD][eE][lL][eE][tT][eE]) *(((\n)+ *)|( +))(\n)*([fF][rR][oO][mM])(( *[a-zA-Z0-9]+ *(((\n)+ *)|( *)))) *(\n)*;+)");
-    const regex DELETE_NAME(R"(([dD][eE][lL][eE][tT][eE]) *(((\n)+ *)|( +))([a-zA-Z0-9]+)(((\n)+ *)|( *))(\n)*([wW][hH][eE][rR][eE]) *(((\n)+ *)|( +))[a-zA-Z0-9]+ *(((\n)+ *)|( *))(=+) *(((\n)+ *)|( *))\"+[^\"]+\"*(((\n)+ *)|( *));+)");
-    const regex DELETE_ID(R"(([dD][eE][lL][eE][tT][eE]) *(((\n)+ *)|( +))([a-zA-Z0-9]+ *(((\n)+ *)|( *)))([wW][hH][eE][rR][eE]) *(((\n)+ *)|( +))[a-zA-Z0-9]+ *(((\n)+ *)|( *))(=|!=|>|<|>=|<=) *(((\n)+ *)|( *))\" *(((\n)+ *)|( *))[0-9]+ *(((\n)+ *)|( *))\" *(((\n)+ *)|( *));+)");
+    const regex DELETE_NAME(R"(([dD][eE][lL][eE][tT][eE]) *(((\n)+ *)|( +))([a-zA-Z0-9_]+)(((\n)+ *)|( *))(\n)*([wW][hH][eE][rR][eE]) *(((\n)+ *)|( +))[a-zA-Z0-9_]+ *(((\n)+ *)|( *))(=+) *(((\n)+ *)|( *))\"+[^\"]+\"*(((\n)+ *)|( *));+)");
+    const regex DELETE_ID(R"(([dD][eE][lL][eE][tT][eE]) *(((\n)+ *)|( +))([a-zA-Z0-9_]+ *(((\n)+ *)|( *)))([wW][hH][eE][rR][eE]) *(((\n)+ *)|( +))[a-zA-Z0-9_]+ *(((\n)+ *)|( *))(=|!=|>|<|>=|<=) *(((\n)+ *)|( *))\" *(((\n)+ *)|( *))[a-zA-Z0-9_]+ *(((\n)+ *)|( *))\" *(((\n)+ *)|( *));+)");
     const regex WHERE(R"(([wW][hH][eE][rR][eE]))");
     const regex FROM(R"(([fF][rR][oO][mM]))");
     const regex LEFT_JOIN(R"(([lL][eE][fF][tT]_[jJ][oO][iI][nN]))");
     const regex ON(R"(([oO][nN]))");
-    char temp[1024]{};
+    const regex ZNAK(R"((=|!=|>|<|>=|<=))");
+    char temp[1024]{}, find_znak[1024]{};
     char* line;
     char* table, * all, * el, * res, * table1, * table2;
     string temps;
@@ -526,6 +543,8 @@ string ParseIdentificators(string inputString, string ID, string*** tables)
 
             line = strtok(temp, " ,.(;");
             line = strtok(NULL, " ,.(;");
+
+            //if(regex_search(line, tested,inputString.c_str()))
             line = strtok(NULL, " ,.(;");
             for (int i = 0; i < 5; i++)
             {
@@ -549,12 +568,13 @@ string ParseIdentificators(string inputString, string ID, string*** tables)
                 return return_value[i].str();
             }
         }
-        if (regex_search(inputString, return_value, DELETE_NAME)) {
+        if (regex_search(inputString, return_value, DELETE_ID)) {
 
             strcpy(temp, inputString.c_str());
+            strcpy(find_znak, inputString.c_str());
             line = strtok(temp, " ,.();=");
             for (int i = 0; line != NULL; i++) {
-                line = strtok(NULL, " ,.();=");
+                line = strtok(NULL, " ,.();=><!");
                 if (line == NULL) break;
                 temps = line;
                 if (i == 0) table = line;
@@ -564,10 +584,243 @@ string ParseIdentificators(string inputString, string ID, string*** tables)
 
                 if (i == t + 1 && line != nullptr) {
                     el = line;
+
+                    //--------------------------------------------------------------------------------------------------------------
+                    //видалення таблиці
+
+                    for (int ii = 0; ii < 5; ii++) //пошук таблиці
+                    {
+                        cout << "delete tables " << tables[i][0][0] << "\t";
+                        if (tables[ii][0][0] == table)
+                        {
+                            for (int j = 1; j < 6; j++)
+                            {
+                                cout << tables[ii][j][0]/*<<"\t"<<el*/ << endl;
+                                if (tables[ii][j][0] == el)//пошук колонки
+                                {
+                                    cout << "column with name " << el << " found" << endl;
+                                    // strcpy(temp, inputString.c_str());
+
+                                    //                                    do{
+                                    //                                        line = strtok(NULL, " \",.();");
+                                    //                                        if (line != nullptr)
+                                    //                                            cout<<line<<endl;
+                                    //                                        else break;
+                                    //                                    }
+                                    //                                    while(line!=nullptr||regex_search(line, temp, ZNAK)!=0);
+                                    int variant = 0;
+                                    string test_line = strtok(NULL, " ,.();=\"");
+                                    for (int i = 0; i < 1024 && temp[i] != ';'; i++)//пошук знаку
+                                    {
+                                        if (find_znak[i] == '=' && find_znak[i - 1] == '>')
+                                        {
+                                            variant = 4;
+                                            break;
+                                        }
+                                        if (find_znak[i] == '=' && find_znak[i - 1] == '<')
+                                        {
+                                            variant = 3;
+                                            break;
+                                        }
+                                        if (find_znak[i] == '=' && find_znak[i - 1] == '!')
+                                        {
+                                            variant = 2;
+                                            break;
+                                        }
+
+                                        if (find_znak[i] == '=' && find_znak[i - 1] != '>' && find_znak[i - 1] != '<' && find_znak[i - 1] != '!')
+                                        {
+                                            variant = 1;
+                                            break;
+                                        }
+                                        if (find_znak[i] == '>' && find_znak[i + 1] != '=')
+                                        {
+                                            variant = 5;
+                                            break;
+                                        }
+                                        if (find_znak[i] == '<' && find_znak[i + 1] != '=')
+                                        {
+                                            variant = 6;
+                                            break;
+                                        }
+
+                                    }
+                                    test_line = strtok(NULL, " ,.();=\"");
+                                    if (variant > 2) //перевірка чи є рядки таблиці і аргумент цифрами
+                                    {
+                                        if (!is_number(test_line))
+                                        {
+                                            cout << "argument " << test_line << " is not a number!\n";
+                                            throw std::invalid_argument("_");
+
+                                        }
+                                        for (int m = 1; m < 6; m++)
+                                        {
+                                            if (!tables[ii][j][m].empty())
+                                            {
+                                                if (!is_number(tables[ii][j][m]))
+                                                {
+                                                    cout << "line of table  " << tables[ii][j][m] << " is not a number!\n";
+                                                    throw std::invalid_argument("_");
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                    // cout<<" znak = has been found\n";
+                                    switch (variant)
+                                    {
+                                    case 1: //=
+                                        for (int m = 1; m < 6; m++)
+                                        {
+                                            if (!tables[ii][j][m].empty())cout << tables[ii][j][m] << "\t" << test_line;
+                                            if (tables[ii][j][m] == test_line) {
+                                                cout << "line has been deleted\n";
+                                                tables[ii][j][m].clear();
+                                            }
+                                        }
+                                        break;
+                                    case 4: //>=
+                                        for (int m = 1; m < 6; m++)
+                                        {
+
+                                            if (is_number(tables[ii][j][m]))
+                                            {
+                                                cout << tables[ii][j][m] << endl;
+                                                if (tables[ii][j][m] >= test_line)
+                                                {
+                                                    cout << tables[ii][j][m] << " more or equal " << test_line << endl;
+                                                    tables[ii][j][m].clear();
+                                                }
+
+                                            }
+
+
+                                        }
+                                        break;
+                                    case 3: //<=
+                                        for (int m = 1; m < 6; m++)
+                                        {
+
+                                            if (is_number(tables[ii][j][m]))
+                                            {
+                                                cout << tables[ii][j][m] << endl;
+                                                if (tables[ii][j][m] <= test_line)
+                                                {
+                                                    cout << tables[ii][j][m] << " less or equal " << test_line << endl;
+                                                    tables[ii][j][m].clear();
+                                                }
+
+                                            }
+
+
+                                        }
+                                        break;
+                                    case 2: //!=
+                                        for (int m = 1; m < 6; m++)
+                                        {
+                                            if (tables[ii][j][m] != line)
+                                            {
+                                                if (!tables[ii][j][m].empty())cout << tables[ii][j][m] << "\t" << test_line;
+                                                if (tables[ii][j][m] != test_line) {
+                                                    cout << "line has been deleted\n";
+                                                    tables[ii][j][m].clear();
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    case 5: //>
+                                        for (int m = 1; m < 6; m++)
+                                        {
+
+                                            if (is_number(tables[ii][j][m]))
+                                            {
+                                                cout << tables[ii][j][m] << endl;
+                                                if (tables[ii][j][m] > test_line)
+                                                {
+                                                    cout << tables[ii][j][m] << " more than " << test_line << endl;
+                                                    tables[ii][j][m].clear();
+                                                }
+
+                                            }
+
+
+                                        }
+                                        break;
+                                    case 6: //<
+                                        for (int m = 1; m < 6; m++)
+                                        {
+
+                                            if (is_number(tables[ii][j][m]))
+                                            {
+                                                cout << tables[ii][j][m] << endl;
+                                                if (tables[ii][j][m] < test_line)
+                                                {
+                                                    cout << tables[ii][j][m] << " less than " << test_line << endl;
+                                                    tables[ii][j][m].clear();
+                                                }
+
+                                            }
+
+
+                                        }
+                                        break;
+                                    default:
+                                    {
+                                        cout << "no any zkak\n";
+                                        cout << "can`t find column with name " << el << endl;
+                                        throw std::invalid_argument("_");
+
+                                    }
+                                    }
+
+
+
+
+
+
+                                    break;
+                                }
+                                if (j == 5)//колонку не знайшло
+                                {
+                                    cout << "can`t find column with name " << el << endl;
+                                    throw std::invalid_argument("_");
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        if (i == 4)//не знайшло таблицю
+                        {
+                            cout << "can`t find table " << table << endl;
+                            throw std::invalid_argument("_");
+                            break;
+
+                        }
+                    }
+
+
+                    //видалення таблиці
+                    //--------------------------------------------------------------------------------------------------------------
+
                     cout << "elements has been deleted from table " << table << " where " << el << " = ";
                 }
                 if (i >= t + 2 && line != nullptr) cout << line << " ";
             }
+            cout << endl;
+            for (int i = 0; i < 5; i++)
+            {
+                for (int j = 0; j < 6; j++)
+                {
+                    for (int m = 0; m < 6; m++)
+                    {
+                        cout << tables[i][j][m] << "\t";
+                    }
+                    cout << endl;
+                }
+            }
+
 
             cout << "\n";
             for (int i = 0; i < 3; i++) {
@@ -592,13 +845,6 @@ string ParseIdentificators(string inputString, string ID, string*** tables)
 
 int main()
 {
-
-
-    //    for(int i=0; i<255; i++)
-    //    {
-    //        cout<<"i= "<<i<<"=\t"<<(char)i<<endl;
-    //    }
-
     string s;
     string*** tables = new string * *[5];
     for (int i = 0; i < 5; i++)
